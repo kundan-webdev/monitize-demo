@@ -1,0 +1,1 @@
+export { useSmoothScrollAnchors } from "./useSmoothScrollAnchors";
