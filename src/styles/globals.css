@@ -35,7 +35,7 @@ body {
 }
 
 .hero-marquee-track {
-  animation: hero-marquee 30s linear infinite;
+  animation: hero-marquee 40s linear infinite;
   will-change: transform;
 }
 

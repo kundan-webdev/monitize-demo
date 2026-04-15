@@ -1,5 +1,7 @@
 import { MarketingTopNav } from "@/features/marketing/components/MarketingTopNav";
+import TryTools from "@/features/marketing/sections/TryTools";
 import {
+  
   CoreToolsSection,
   CTASection,
   FAQSection,
@@ -15,8 +17,10 @@ export default function MarketingPage() {
     <main className="bg-white text-text">
       <MarketingTopNav />
       <HeroSection />
-      <WhatIsMonitizeSection />
       <CoreToolsSection />
+      <WhatIsMonitizeSection />
+      <TryTools />
+  
       <HowItWorksSection />
       <FrameworkSection />
       <InfrastructureSection />
