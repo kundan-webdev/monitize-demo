@@ -1,205 +1,138 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { forwardRef, useMemo, useRef, useState } from "react";
+import HTMLFlipBook from "react-pageflip";
 import LearnSectionLabel from "@/features/learn/components/LearnSectionLabel";
 
-type PreviewCard = {
-  title: string;
-  body: string;
-  tone?: "default" | "light";
-  variant: "bars" | "regime" | "chips" | "flow";
+type BookOrientation = "portrait" | "landscape";
+
+type FlipBookInstance = {
+  flipPrev: () => void;
+  flipNext: () => void;
 };
 
-const previewSlides: PreviewCard[][] = [
-  [
-    {
-      title: "How Much Tax Is Deducted?",
-      body: "Visual breakdown of TDS across salary, freelance, interest income, and rental earnings based on current slabs.",
-      variant: "bars"
-    },
-    {
-      title: "Old vs New Regime Simulator",
-      body: "Interactive comparison framework. Input your income and compare both regimes with transparent math.",
-      tone: "light",
-      variant: "regime"
-    }
-  ],
-  [
-    {
-      title: "Section 80C Full Map",
-      body: "All eligible 80C investments mapped visually with limits clearly marked.",
-      variant: "chips"
-    },
-    {
-      title: "Capital Gains Flowchart",
-      body: "Decision tree to identify LTCG vs STCG across equity, debt, and real estate assets.",
-      tone: "light",
-      variant: "flow"
-    }
-  ]
+type FlipBookRef = {
+  pageFlip: () => FlipBookInstance;
+};
+
+const imagePages = [
+  "/images/001.png",
+  "/images/002.png",
+  "/images/003.png",
+  "/images/004.png",
+  "/images/005.png",
 ];
 
-function BarsPreview() {
-  const bars = [40, 65, 50, 80, 55];
-
-  return (
-    <div className="mt-4 flex items-end gap-1.5">
-      {bars.map((height, index) => (
-        <div
-          key={`${height}-${index}`}
-          style={{ height }}
-          className={[
-            "w-5 rounded-t",
-            index % 2 === 0 ? "bg-emerald-500" : "bg-emerald-400"
-          ].join(" ")}
+// ✅ Proper Page Component (optimized)
+const Page = forwardRef<HTMLDivElement, { src: string }>(
+  ({ src }, ref) => {
+    return (
+      <div ref={ref} className="h-full w-full bg-[#0f1724]">
+        <img
+          src={src}
+          alt="page"
+          loading="lazy"
+          className="h-full w-full object-cover select-none pointer-events-none"
         />
-      ))}
-    </div>
-  );
-}
-
-function RegimePreview() {
-  return (
-    <div className="mt-4 w-full max-w-[220px] text-[11px] text-slate-700">
-      <div className="mb-1 flex items-center justify-between">
-        <span>Old Regime</span>
-        <span className="font-semibold">Rs 1,54,000</span>
       </div>
-      <div className="mb-3 h-2 rounded-full bg-slate-300">
-        <div className="h-full w-[70%] rounded-full bg-emerald-500" />
-      </div>
+    );
+  }
+);
 
-      <div className="mb-1 flex items-center justify-between">
-        <span>New Regime</span>
-        <span className="font-semibold">Rs 1,20,000</span>
-      </div>
-      <div className="h-2 rounded-full bg-slate-300">
-        <div className="h-full w-[55%] rounded-full bg-emerald-400" />
-      </div>
-    </div>
-  );
-}
-
-function ChipsPreview() {
-  const chips = ["PPF", "ELSS", "NSC", "LIC", "Home Loan Principal"];
-
-  return (
-    <div className="mt-4 flex flex-wrap justify-center gap-1.5">
-      {chips.map((chip) => (
-        <span
-          key={chip}
-          className="rounded-full border border-emerald-500/35 bg-emerald-500/15 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.06em] text-emerald-700"
-        >
-          {chip}
-        </span>
-      ))}
-    </div>
-  );
-}
-
-function FlowPreview() {
-  return (
-    <p className="mt-4 text-center text-[11px] font-semibold uppercase tracking-[0.08em] text-emerald-700">
-      Asset sold?
-      <br />
-      down
-      <br />
-      Held over 12m?
-      <br />
-      down
-      <br />
-      LTCG at 10%
-    </p>
-  );
-}
+Page.displayName = "Page";
 
 export default function LearnSneakPeekSection() {
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const bookRef = useRef<FlipBookRef | null>(null);
 
-  const slideCount = previewSlides.length;
+  const [currentPage, setCurrentPage] = useState(0);
+  const [orientation, setOrientation] =
+    useState<BookOrientation>("landscape");
 
-  const shiftStyle = useMemo(
-    () => ({
-      transform: `translateX(-${currentSlide * 100}%)`
-    }),
-    [currentSlide]
+  const totalPages = imagePages.length;
+
+  const readablePage = useMemo(
+    () => Math.min(currentPage + 1, totalPages),
+    [currentPage, totalPages]
   );
+
+  const onFlip = (e: { data: number }) => {
+    setCurrentPage(e.data ?? 0);
+  };
+
+  const onOrientationChange = (e: { data: BookOrientation }) => {
+    setOrientation(e.data ?? "landscape");
+  };
+
+  const flipPrev = () => {
+    bookRef.current?.pageFlip().flipPrev();
+  };
+
+  const flipNext = () => {
+    bookRef.current?.pageFlip().flipNext();
+  };
 
   return (
     <section id="sneak-peek" className="scroll-mt-24">
       <LearnSectionLabel>Take a Sneak Peek</LearnSectionLabel>
+
       <h2 className="mb-5 text-xl font-bold tracking-tight text-slate-100 sm:text-2xl">
         Inside the learning track
       </h2>
 
-      <div className="relative overflow-hidden rounded-2xl border border-slate-700 bg-[#0f2030]">
-        <div className="flex transition-transform duration-500" style={shiftStyle}>
-          {previewSlides.map((slide, slideIndex) => (
-            <div
-              key={`slide-${slideIndex}`}
-              className="grid min-w-full grid-cols-1 gap-px bg-slate-700 md:grid-cols-2"
-            >
-              {slide.map((card) => (
-                <div
-                  key={card.title}
-                  className={[
-                    "min-h-[300px] px-5 py-7 text-center sm:px-8",
-                    card.tone === "light" ? "bg-[#eef5f0]" : "bg-[#f5f0e8]"
-                  ].join(" ")}
-                >
-                  <h3 className="text-sm font-bold text-slate-900">{card.title}</h3>
-                  <p className="mx-auto mt-2 max-w-[260px] text-xs leading-relaxed text-slate-600">
-                    {card.body}
-                  </p>
-
-                  {card.variant === "bars" ? <BarsPreview /> : null}
-                  {card.variant === "regime" ? <RegimePreview /> : null}
-                  {card.variant === "chips" ? <ChipsPreview /> : null}
-                  {card.variant === "flow" ? <FlowPreview /> : null}
-                </div>
-              ))}
-            </div>
-          ))}
+      <div className="rounded-2xl border border-slate-700 bg-[#0f2030] p-3 sm:p-5">
+        {/* ✅ Responsive container */}
+        <div className="mx-auto w-full max-w-[900px]">
+          <HTMLFlipBook
+            ref={bookRef}
+            width={400}
+            height={520}
+            size="stretch"
+            minWidth={260}
+            maxWidth={520}
+            minHeight={320}
+            maxHeight={650}
+            drawShadow={false}               // 🔥 performance fix
+            flippingTime={500}              // 🔥 smoother + lighter
+            usePortrait
+            autoSize
+            showCover={false}
+            mobileScrollSupport
+            clickEventForward
+            useMouseEvents
+            swipeDistance={30}
+            showPageCorners
+            className="mx-auto"
+            onFlip={onFlip}
+            onChangeOrientation={onOrientationChange}
+          >
+            {imagePages.map((src, i) => (
+              <Page key={i} src={src} />
+            ))}
+          </HTMLFlipBook>
         </div>
 
-        <button
-          type="button"
-          onClick={() =>
-            setCurrentSlide((previous) => (previous - 1 + slideCount) % slideCount)
-          }
-          className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full border border-slate-700 bg-[#0b1c2d]/90 px-3 py-1.5 text-sm font-semibold text-slate-200 transition hover:border-emerald-400 hover:text-emerald-200"
-          aria-label="Previous preview slide"
-        >
-          {"<"}
-        </button>
+        {/* ✅ Controls */}
+        <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-xs font-medium text-slate-300">
+            [{readablePage} of {totalPages}] | {orientation}
+          </p>
 
-        <button
-          type="button"
-          onClick={() => setCurrentSlide((previous) => (previous + 1) % slideCount)}
-          className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full border border-slate-700 bg-[#0b1c2d]/90 px-3 py-1.5 text-sm font-semibold text-slate-200 transition hover:border-emerald-400 hover:text-emerald-200"
-          aria-label="Next preview slide"
-        >
-          {">"}
-        </button>
-      </div>
-
-      <div className="mt-4 flex justify-center gap-2">
-        {previewSlides.map((_, slideIndex) => {
-          const isActive = currentSlide === slideIndex;
-
-          return (
+          <div className="flex items-center gap-2">
             <button
-              key={`dot-${slideIndex}`}
-              type="button"
-              onClick={() => setCurrentSlide(slideIndex)}
-              aria-label={`Go to preview slide ${slideIndex + 1}`}
-              className={[
-                "h-2 rounded-full transition-all",
-                isActive ? "w-6 bg-emerald-400" : "w-2 bg-slate-600 hover:bg-slate-500"
-              ].join(" ")}
-            />
-          );
-        })}
+              onClick={flipPrev}
+              className="rounded-md border border-slate-600 px-3 py-1.5 text-xs font-semibold text-slate-100 hover:border-emerald-400 hover:text-emerald-200"
+            >
+              Prev
+            </button>
+
+            <button
+              onClick={flipNext}
+              className="rounded-md border border-slate-600 px-3 py-1.5 text-xs font-semibold text-slate-100 hover:border-emerald-400 hover:text-emerald-200"
+            >
+              Next
+            </button>
+          </div>
+        </div>
       </div>
     </section>
   );
