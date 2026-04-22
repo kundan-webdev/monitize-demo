@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 const navItems = [
+  { label: "Learn Track", href: "/lernpage" },
   { label: "About", href: "#about-monitize" },
   { label: "Tools", href: "#tools" },
   { label: "How It Works", href: "#how-it-works" },

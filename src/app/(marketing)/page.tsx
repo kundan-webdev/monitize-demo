@@ -1,7 +1,6 @@
 import { MarketingTopNav } from "@/features/marketing/components/MarketingTopNav";
 import TryTools from "@/features/marketing/sections/TryTools";
 import {
-  
   CoreToolsSection,
   CTASection,
   FAQSection,
@@ -9,7 +8,7 @@ import {
   HeroSection,
   HowItWorksSection,
   InfrastructureSection,
-  WhatIsMonitizeSection
+  WhatIsMonitizeSection,
 } from "@/features/marketing";
 
 export default function MarketingPage() {
@@ -20,7 +19,6 @@ export default function MarketingPage() {
       <CoreToolsSection />
       <WhatIsMonitizeSection />
       <TryTools />
-  
       <HowItWorksSection />
       <FrameworkSection />
       <InfrastructureSection />
