@@ -23,21 +23,18 @@ const imagePages = [
   "/images/005.png",
 ];
 
-// ✅ Proper Page Component (optimized)
-const Page = forwardRef<HTMLDivElement, { src: string }>(
-  ({ src }, ref) => {
-    return (
-      <div ref={ref} className="h-full w-full bg-[#0f1724]">
-        <img
-          src={src}
-          alt="page"
-          loading="lazy"
-          className="h-full w-full object-cover select-none pointer-events-none"
-        />
-      </div>
-    );
-  }
-);
+const Page = forwardRef<HTMLDivElement, { src: string }>(({ src }, ref) => {
+  return (
+    <div ref={ref} className="h-full w-full bg-[#0f1724]">
+      <img
+        src={src}
+        alt="page"
+        loading="lazy"
+        className="pointer-events-none h-full w-full select-none object-cover"
+      />
+    </div>
+  );
+});
 
 Page.displayName = "Page";
 
@@ -45,8 +42,7 @@ export default function LearnSneakPeekSection() {
   const bookRef = useRef<FlipBookRef | null>(null);
 
   const [currentPage, setCurrentPage] = useState(0);
-  const [orientation, setOrientation] =
-    useState<BookOrientation>("landscape");
+  const [orientation, setOrientation] = useState<BookOrientation>("landscape");
 
   const totalPages = imagePages.length;
 
@@ -80,10 +76,11 @@ export default function LearnSneakPeekSection() {
       </h2>
 
       <div className="rounded-2xl border border-slate-700 bg-[#0f2030] p-3 sm:p-5">
-        {/* ✅ Responsive container */}
         <div className="mx-auto w-full max-w-[900px]">
           <HTMLFlipBook
             ref={bookRef}
+            style={{}}
+            startPage={0}
             width={400}
             height={520}
             size="stretch"
@@ -91,16 +88,19 @@ export default function LearnSneakPeekSection() {
             maxWidth={520}
             minHeight={320}
             maxHeight={650}
-            drawShadow={false}               // 🔥 performance fix
-            flippingTime={500}              // 🔥 smoother + lighter
+            startZIndex={0}
+            drawShadow={false}
+            flippingTime={500}
             usePortrait
             autoSize
+            maxShadowOpacity={1}
             showCover={false}
             mobileScrollSupport
             clickEventForward
             useMouseEvents
             swipeDistance={30}
             showPageCorners
+            disableFlipByClick={false}
             className="mx-auto"
             onFlip={onFlip}
             onChangeOrientation={onOrientationChange}
@@ -111,7 +111,6 @@ export default function LearnSneakPeekSection() {
           </HTMLFlipBook>
         </div>
 
-        {/* ✅ Controls */}
         <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs font-medium text-slate-300">
             [{readablePage} of {totalPages}] | {orientation}
